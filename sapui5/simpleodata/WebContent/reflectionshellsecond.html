@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.ui.commons, sap.ui.ux3"
+				data-sap-ui-theme="sap_goldreflection">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
+
+		<script>
+			var shell = new sap.ui.ux3.Shell("shell1", {
+				appTitle: "The goal reflection shell in 21 seconds", 
+				showSearchTools: true, 
+				worksetItems: [
+					new sap.ui.ux3.NavigationItem({
+						key:"Home", 
+						text:"Home", 
+						subItems: [
+						           new sap.ui.ux3.NavigationItem({key:"overview", text:"overview"}), 
+						           new sap.ui.ux3.NavigationItem({key:"inbox", text:"inbox"}), 
+						           new sap.ui.ux3.NavigationItem({key:"news", text:"news"})
+						           ]
+					}), 
+					new sap.ui.ux3.NavigationItem({key:"Sales_Order", text:"Sales Order"}), 
+					new sap.ui.ux3.NavigationItem({key:"Analyze", text:"Analyze"})
+				], 
+				paneBarItems: [
+					new sap.ui.core.Item({key:"people", text:"people"})
+				],
+				logout:function() {
+					alert("User wants to log out...");
+				}
+			});
+			
+			shell.setPaneContent(new sap.ui.commons.Button({text:"Hello World!"}));
+			shell.attachWorksetItemSelected(function(oEvent) {
+				var key = oEvent.getParameter("key");
+				shell.setContent(new sap.ui.commons.Button({text:key}));
+			});
+			shell.setContent(new sap.ui.commons.Button({text:"overview"}));
+			shell.placeAt("content");
+		</script>
+
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>
