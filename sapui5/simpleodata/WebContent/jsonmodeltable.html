@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.ui.commons, sap.ui.table"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
+
+		<script>
+			function pad(input) {
+				var str = ''+input;
+				while(str.length<2) {
+					str='0'+str;
+				}
+				return str;
+			}
+			
+			function formatDate(date) {
+				var d = new Date(parseInt(date));
+				return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())+" "+pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+			}
+			
+			var oTable = new sap.ui.table.Table();
+			oTable.addColumn(new sap.ui.table.Column("name", {
+				label:new sap.ui.commons.Label({text:"Snippet ID"}),
+				template:new sap.ui.commons.TextView({text:"{name}"}),
+				sortProperty:"name",
+				filterProperty:"date"
+			}));
+			oTable.placeAt("content");
+		</script>
+
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>

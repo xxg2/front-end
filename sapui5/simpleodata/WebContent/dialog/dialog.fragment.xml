@@ -1,0 +1,6 @@
+<Dialog xmlns="sap.ui.commons" title="XML Fragment Dialog">
+	<TextView text="{/contentText}" />
+	<buttons>
+		<Button text="{/actionText}" press="closeDialog" />
+	</buttons>
+</Dialog>

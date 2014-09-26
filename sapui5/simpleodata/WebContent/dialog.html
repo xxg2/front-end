@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.ui.commons"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
+
+		<script>
+			sap.ui.localResources("dialog");
+			var data = {
+					contentText: "Some Fragment Content",
+					actionText: "Close Dialog"
+				};
+			var oModel = new sap.ui.model.json.JSONModel();
+			oModel.setData(data);
+			var oFragmentDialog;
+			new sap.ui.commons.Button({
+				text:"press me!",
+				press: function() {
+					var dummyDialog = {
+						closeDialog:function() {
+							oFragmentDialog.close();
+						}
+					};
+					
+					if(!oFragmentDialog) {
+						oFragmentDialog = sap.ui.xmlfragment({id:"dialog1", fragmentName:"dialog.dialog"}, dummyDialog);
+						oFragmentDialog.setModel(oModel);
+					}
+					oFragmentDialog.open();
+				}
+			}).placeAt("content");
+		</script>
+
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>

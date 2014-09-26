@@ -12,11 +12,15 @@
 		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
 
 		<script>
-			var btn = new sap.m.Button({text:"OK"});
-			btn.attachPress(function() {
-				alert("test");
-			});
-			btn.placeAt("content");
+			sap.ui.localResources("simpleodata");
+			var data = {
+				actionName:"Say Hello"
+			};
+			
+			var myView = sap.ui.view({id:"idindex1", viewName:"simpleodata.view", type:sap.ui.core.mvc.ViewType.XML});
+			var oModel = new sap.ui.model.json.JSONModel(data);
+			myView.setModel(oModel);
+			myView.placeAt("content");
 		</script>
 
 	</head>
