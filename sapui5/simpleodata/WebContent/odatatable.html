@@ -6,13 +6,24 @@
 
 		<script src="resources/sap-ui-core.js"
 				id="sap-ui-bootstrap"
-				data-sap-ui-libs="sap.m"
+				data-sap-ui-libs="sap.ui.commons, sap.ui.table"
 				data-sap-ui-theme="sap_bluecrystal">
 		</script>
 		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
 
 		<script>
+			var url="/simpleodata/proxy/http/services.odata.org/Northwind/Northwind.svc";
+			var oModel = new sap.ui.model.odata.ODataModel(url, true);
+			var oTable = new sap.ui.table.Table({
+				columns:[
+					{label:"Product Name", template: "ProductName", sortProperty:"ProductName"},
+					{label:"Product Sales", template: "ProductSales", sortProperty:"ProductSales"}
+				]
+			});
+			oTable.setModel(oModel);
+			oTable.bindRows("/Product_Sales_for_1997"); // bind the rows against a certain root-level collection in the service
 			
+			oTable.placeAt("content"); // place model onto UI
 		</script>
 
 	</head>
