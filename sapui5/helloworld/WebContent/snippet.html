@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>UI5 CVOM + D3.JS Charts</title>
+	
+
+
+    <!-- Load SAPUI5, select gold reflection theme and commons+ux3 control libraries -->
+    <script id="sap-ui-bootstrap"
+        type="text/javascript"
+        src='resources/sap-ui-core.js'
+        data-sap-ui-theme="sap_goldreflection"
+        data-sap-ui-libs="sap.ui.commons,sap.ui.ux3,sap.ui.table,sap.service.visualization"></script> <!--  -->
+
+	<script src="http://d3js.org/d3.v2.js?2.8.1"></script>
+
+	<style>
+	svg {
+		/*background-color: red;*/
+	}
+	
+	.axis path, .axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+
+	.brush .extent {
+	  stroke: #fff;
+	  fill-opacity: .125;
+	  shape-rendering: crispEdges;
+	}	
+	
+	circle {
+	  -webkit-transition: fill-opacity 250ms linear;
+	}
+
+	.selecting circle {
+	  fill-opacity: .2;
+	}
+
+	.selecting circle.selected {
+	  stroke: #113975;
+	}	
+	
+	.bubbles {
+		opacity: .8;
+		stroke: #ccc;
+	}
+	
+	</style>
+	
+	<script>
+	
+
+	//chart items
+	sap.ui.core.Element.extend("my.BubbleItem", { metadata : {
+		properties : {
+			"key" : {type : "string", group : "Misc", defaultValue : null},
+			"x" : {type : "string", group : "Misc", defaultValue : null},
+			"y" : {type : "string", group : "Misc", defaultValue : null},
+			"z" : {type : "string", group : "Misc", defaultValue : null},
+			"descr" : {type : "string", group : "Misc", defaultValue : null},
+			"fourth" : {type : "string", group : "Misc", defaultValue : null}			
+		}
+	}});	    
+    
+	//Pie chart
+    sap.ui.core.Control.extend("my.Bubble", { 
+        // the control API:
+        metadata : {
+            properties : {           // setter and getter are created behind the scenes, incl. data binding and type validation
+            	"fourth": {type:"string", defaultValue: undefined}
+            },
+			aggregations : {
+				"items" : { type: "my.BubbleItem", multiple : true, singularName : "item"}
+			},
+			events: {
+				"select" : {},
+				"selectEnd": {}				
+			}			
+        },
+	
+		
+        // the part creating the HTML:
+        renderer : function(oRm, oControl) { // static function, so use the given "oControl" instance instead of "this" in the renderer function
+            oRm.write("<div"); 
+            oRm.writeControlData(oControl);  // writes the Control ID and enables event handling - important!
+            oRm.addClass("bubble");        // add a CSS class for styles common to all control instances
+            oRm.writeClasses();              // this call writes the above class plus enables support for Square.addStyleClass(...)				
+            oRm.write(">");
+            oRm.write("</div>");
+        },
+		
+		onAfterRendering: function() {
+			var that = this;
+			var fourth = this.getFourth();
+			var aItems = this.getItems();
+			var data = [];
+			for (var i=0;i<aItems.length;i++){
+				var oEntry = {};
+				for (var j in aItems[i].mProperties) {
+					oEntry[j]=aItems[i].mProperties[j];
+				}					
+				data.push(oEntry);
+			}
+			
+			var containerWidth = jQuery.sap.byId(this.oParent.sId).width() || 800;
+			
+			var margin = {top: 10, right: 40, bottom: 40, left: 40},
+				width = containerWidth - margin.right - margin.left,
+				height = 500 - margin.top - margin.bottom;
+			var maxR = 40;
+			color = d3.scale.category20c();     //builtin range of colors
+			color1 = function scale(x) {
+				var aCol = ["#0e304c","#efa900","#a6a6a6","#676767","#0560a8","#0e4076","#cc980d","#b68001","#fefefe"];
+				return aCol[x];
+			}
+			
+			/* scales for x, y and radius */
+			xScale = d3.scale.log()
+					.domain([
+						d3.min(data,function(d){return parseInt(d.x)})*0.9,
+						d3.max(data,function(d){return parseInt(d.x)})*1.1
+					])
+					.range([0,width]);
+			yScale = d3.scale.log()
+					.domain([
+						d3.max(data,function(d){return parseInt(d.y)})+2000000,
+						d3.min(data,function(d){return parseInt(d.y)})*0.9
+					])
+					.range([0,height]);	
+
+			rScale = d3.scale.linear()
+					.domain([
+						1,
+						d3.max(data,function(d){return parseInt(d.z)})
+					])
+					.range([1,maxR]);						
+			
+			/* create rectangle which contains the chart */
+			var vis = d3.select("#"+this.getId())
+			.append("svg")
+			.attr("width", width + margin.right + margin.left)
+			.attr("height", height + margin.top + margin.bottom)
+			.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				
+			/* introduce gradients in bubbles */	
+			var defs = vis.append('defs');
+			var grad = defs
+				.selectAll("radialGradient")
+				.data(data)
+				.enter()
+				.append('radialGradient')
+				.attr('id', function(d, i) { return "grad"+i; })
+				.attr('cx', "50%").attr('cy', "50%").attr('fx', "10%").attr('fy', "10%")
+				.attr('r', '1')
+				.call(
+				function(gradient) {
+					gradient.append('stop')
+						.attr('offset', '0%')
+						.attr('style', 'stop-color:white;stop-opacity:0');
+					gradient.append('stop')
+						.attr("class", "gradstop")
+						.attr('offset', '50%')
+						.attr('style', 'stop-opacity:1')
+				});
+				
+			var stops = defs.selectAll(".gradstop");
+			stops.attr('style', function(d,i){ return 'stop-color:'+color(i);});	
+
+			/* x and y axis */
+			vis.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")")
+				.call(d3.svg.axis().scale(xScale).orient("bottom").ticks(10, function(text){return parseInt(text)/1000000}));
+
+			vis.append("g")
+				.attr("class", "y axis")
+				.call(d3.svg.axis().scale(yScale).orient("left").ticks(20, function(text){return parseInt(text)/1000000}));	
+
+			// Add an x-axis label.
+			vis.append("text")
+				.attr("class", "x label")
+				.attr("text-anchor", "end")
+				.attr("x", width)
+				.attr("y", height - 6)
+				.text("population (millions)");	
+			// Add a y-axis label.
+			vis.append("text")
+				.attr("class", "y label")
+				.attr("text-anchor", "end")
+				.attr("y", 6)
+				.attr("dy", ".75em")
+				.attr("transform", "rotate(-90)")
+				.text("area (million km2)");				
+				
+			/* bubbles */	
+			var bubbles = vis
+				.selectAll("circle")
+				.data(data)
+				.enter()
+				.append("circle")
+				.attr("class", "bubbles")
+				.attr("cx",function(d) { return xScale(d.x)})
+				.attr("cy",function(d) { return yScale(d.y)})
+				.attr("r",function(d) { return rScale(d.z)})
+				/*.style("stroke", "gray")*/
+				//.style("fill", function(d, i) { return color(i); })
+				.style("fill", function(d, i) { return "url(#grad"+i+")"; })
+				.on("mouseover",function(d){
+					vis.append("text")
+					.attr("x",xScale(d.x))
+					.attr("y",yScale(d.y))
+					.text(d.descr)
+					.style("fill", "black" )
+					.attr("class","tip")
+				})
+				.on("mouseout",function(d){
+					d3.selectAll(".tip").remove();
+				});	
+
+			/* brush to select bubbles */	
+			vis.append("g")
+				.attr("class", "brush")
+				.call(d3.svg.brush().x(xScale).y(yScale)
+				.on("brushstart", brushstart)
+				.on("brush", brushmove)
+				.on("brushend", brushend));
+
+			function brushstart() {
+			  vis.classed("selecting", true);
+			}
+
+			function brushmove() {
+				/* get the dimesnions of the rectangle */
+				var e = d3.event.target.extent();
+				/* assign a new css class to all circles withing the rectangle */
+				vis.selectAll("circle").classed("selected", function(d) {
+				return e[0][0] <= d.x && d.x <= e[1][0]
+					&& e[0][1] <= d.y && d.y <= e[1][1];
+				});
+				/* fire select event for all selected circles */
+				var sel = vis.selectAll("circle.selected")[0];
+				var aSel = [];
+				for (var i=0;i<sel.length;i++) {
+					aSel.push(sel[i].__data__.key);
+				}
+				that.fireSelect({keys:aSel});
+			}
+
+			function brushend() {
+				vis.classed("selecting", !d3.event.target.empty());
+				/* fire select event for all selected circles */
+				var sel = vis.selectAll("circle.selected")[0];
+				var aSel = [];
+				for (var i=0;i<sel.length;i++) {
+					aSel.push(sel[i].__data__.key);
+				}
+				that.fireSelectEnd({keys:aSel});
+			}
+
+
+		},
+
+		onmouseup1: function(event) {
+			//alert(typeof event.srcElement);
+			//if (event.srcElement=="SVGCircleElement") {
+			//debugger;
+				var off = parseInt(event.srcElement.cx.baseVal.value)+
+				" "+
+				parseInt(event.srcElement.cy.baseVal.value);
+				//alert(off)
+				oCallout1.setOffset(
+					off
+				);
+			//}
+			
+		}	
+    });  
+
+
+
+    sap.ui.getCore().attachInitEvent(function() {
+	
+	    // Create the ux3 Shell
+	    var oShell = new sap.ui.ux3.Shell("myShell", {
+	        appTitle:"UI5 + D3.JS Charts Demo",                 // give a title
+	        worksetItems:[                                          // add some items to the top navigation
+	            new sap.ui.ux3.NavigationItem({key:"wi_home",text:"Gross domestic product of countries"})
+	        ],
+	        paneBarItems:[  // add also one item to the right-side PaneBar
+	            new sap.ui.core.Item({key:"pb_people",text:"People"})
+	        ],
+	        logout:function() { // create a handler function and attach it to the "logout" event
+	            alert("User wants to log out...");
+	        }
+	    });
+	    
+	    // also set some content for the side pane
+	    oShell.setPaneContent(new sap.ui.commons.Button({text:"This Button is in the Pane"}));
+		
+		var oBusinessData = {
+			"countries":[
+				{ "key":"1", "country" : "Canada", "gdp": 40541,"area":9984670,"population": 34789000 },
+				{ "key":"2", "country" : "China","gdp": 8382,"area":9640821,"population": 1339724852},
+				{ "key":"3", "country" : "France","gdp": 35156,"area":674843,"population": 65350000 },
+				{ "key":"4", "country" : "Germany","gdp": 37896,"area":357021,"population": 81799600},
+				{ "key":"5", "country" : "India","gdp": 3693,"area":3287263,"population": 1210193422},
+				{ "key":"6", "country" : "United States","gdp": 48386,"area":9826675,"population": 313490000},
+				{ "key":"7", "country" : "UK","gdp": 36089,"area":243610,"population": 62262000},
+				{ "key":"8", "country" : "Brasil","gdp": 11769,"area":8514877,"population": 192376496},
+				{ "key":"9", "country" : "Japan","gdp": 34739,"area":377944,"population": 127799000},
+				{ "key":"10", "country" : "Saudi Arabia","gdp": 25465,"area":2250000,"population": 27136977},
+				{ "key":"11", "country" : "Russia","gdp": 16736,"area":17075400,"population": 143030106},	
+		]};
+
+		oModel = new sap.ui.model.json.JSONModel(oBusinessData);
+		
+		// chart and the table share the same model
+		oShell.setModel(oModel);
+		
+		oSelectModel = new sap.ui.model.json.JSONModel(oBusinessData);
+		
+		var oTable = new sap.ui.table.DataTable();
+		
+		var oControl = new sap.ui.commons.TextView().bindProperty("text", "country");
+		oTable.addColumn(new sap.ui.table.Column({label: new sap.ui.commons.Label({text: "Country"}), template: oControl, sortProperty: "country", filterProperty: "country", width: "200px"}));
+		var oControl = new sap.ui.commons.TextView().bindProperty("text", "population");
+		oTable.addColumn(new sap.ui.table.Column({label: new sap.ui.commons.Label({text: "Population"}), template: oControl, sortProperty: "population", filterProperty: "population", width: "200px"}));
+		var oControl = new sap.ui.commons.TextView().bindProperty("text", "gdp");
+		oTable.addColumn(new sap.ui.table.Column({label: new sap.ui.commons.Label({text: "GDP per capita in $"}), template: oControl, sortProperty: "gdp", filterProperty: "gdp", width: "200px"}));
+		var oControl = new sap.ui.commons.TextView().bindProperty("text", "area");
+		oTable.addColumn(new sap.ui.table.Column({label: new sap.ui.commons.Label({text: "Area"}), template: oControl, sortProperty: "area", filterProperty: "area", width: "200px"}));
+
+		oTable.setVisibleRowCount(6);
+		oTable.setModel(oSelectModel);
+		oTable.bindRows("/countries");
+		
+		
+		/* cvom bar chart */
+		var aChartDimensions = [];
+		var aChartMeasures = [[]];
+		for(var i=0;i<oBusinessData.countries.length;i++) {
+			aChartDimensions.push(oBusinessData.countries[i].country);
+			aChartMeasures[0].push(oBusinessData.countries[i].gdp);
+		}
+		
+		var oBar = new sap.service.visualization.chart.Bar({
+					width: "800px",
+					height: "400px",
+					deselectEnabled: true,
+					selectionMode: 'single',
+					title: 'GDP By Country',
+					titleHorizontalAlign:'center',
+					//subTitle: 'Q1 - 2012',
+					subTitleHorizontalAlign:'center',
+					showTitle: true,
+					showLegend: true,
+					legendDirection: 'right',
+					legendFirst: true,
+					legendNumberFormat: ['0.00%'],
+					titleNumberFormat:'0.00%',
+					defaultSelectedItems : [{
+										measureIndex : 1,
+										dimensionItemIndex : 1
+									}],
+					measures:[{
+						barMarkerSize: 20,
+						valueAxis: 0 ,//should be valid index in your value axis (can be xAxis or yAxis)
+						visible: true
+					},
+					{
+						valueAxis: 0
+					}
+					],
+					barMarker:{
+						barMarkerSize:11
+					},
+					xAxis:[{
+						show : true,// show or hide axis and major ticks and minor ticks
+						showMajorTicks : true,// default value = false
+						showMinorTicks : true,// default value = false
+						title : 'GDP per capita ($)',
+						labelsNumberFormat:['#,##0.00%'],
+						titleFormatString : '#,##0.00%',
+						showTitle : true,// show or hide title
+						showLabels : true,// show or hide labels
+						gridLine : {
+							showMajor : true,        
+							majorThickness : '1',
+							showMinor : false,                                 
+							minorThickness : '1',
+							showSub : false,
+						}
+					}],
+
+					yAxis:[{
+						show : true,// show or hide axis and major ticks and minor ticks
+						title : 'Country',
+						labelsNumberFormat:['#,##0.00%'],
+						titleFormatString : '#,##0.00%',
+						showTitle : true,// show or hide title
+						showLabels : true,// show or hide labels
+						gridLine : {
+							showMajor : false,        
+							majorThickness : '1',
+							showMinor : false,                                 
+							minorThickness : '1',
+							showSub : false,
+						}
+					}],
+					dataset: {
+						dimensionItems: aChartDimensions,
+						dimensionName: "countries",
+						measureNames: ["GDP"],
+						data: aChartMeasures
+					}
+				})
+
+		
+	oCallout1 = new sap.ui.commons.Callout( "Callout1", {
+		content: [new sap.ui.commons.TextView({text:"toll"})],
+		open: function(event){
+			jQuery.sap.log.debug("Callout 1: open event received by the application");
+			},
+		close: function(){
+			jQuery.sap.log.debug("Callout 1: close event received by the application");
+			},
+		atPosition: "left top"
+	}).setCloseDuration(50);
+
+
+	    // Page content creation - for each workset the content is defined here 
+	    // For demo purposes there is just one button on each page
+	    var mContent = {}; // a map to remember page content once it is created
+	    function getContent(key) {
+	        if (mContent[key]) return mContent[key]; // if content is already created, return it directly
+	    	
+	        if (key == "wi_home") {
+
+				var oRowTemplate = new my.BubbleItem({key:"{key}",x:"{population}",y:"{area}",z:"{gdp}",descr:"{country}"});
+
+				/* new bubble chart */
+				var myBubble = new my.Bubble({
+					items: {path : "/countries", template : oRowTemplate} 	
+				}).attachSelect(
+					/* selection handler */
+					function(event){
+						/* get the selected ids */
+						var sel = event.getParameter("keys");
+						
+						/* create a filter entry for each key */
+						var aFilter = [];
+						for (var i=0;i<sel.length;i++) {
+							aFilter.push(
+								new sap.ui.model.Filter("key", sap.ui.model.FilterOperator.EQ, sel[i])
+							)
+						}
+						/* bind the table rows with the new filter */
+						oTable.bindRows("/countries",undefined,undefined,aFilter);
+	
+					}
+				).attachSelectEnd(
+					function(event){
+						/* get the selected ids */
+						var sel = event.getParameter("keys");
+						
+						/* create hash map of all data*/
+						var aEntries = event.oSource.getModel().getData().countries;
+						var oCountries = {};
+						for (var j=0;j<aEntries.length;j++) {
+							var oObj = {}							
+							for (var k in aEntries[j]) {
+								if (k!="key") {
+									oObj[k] = aEntries[j][k];
+								}
+							}
+							oCountries[aEntries[j].key] = oObj;
+						}
+						
+						/* create a filter entry for each key */
+						var aChartDimensions = [];
+						var aChartMeasures = [[]];
+						for (var i=0;i<sel.length;i++) {
+							aChartDimensions.push(oCountries[sel[i]].country);
+							aChartMeasures[0].push(oCountries[sel[i]].gdp);
+						}
+						/* empty selection: show all */
+						if (sel.length==0) {
+							for(i=0;i<aEntries.length;i++) {
+								aChartDimensions.push(aEntries[i].country);
+								aChartMeasures[0].push(aEntries[i].gdp);
+							}
+						}
+						
+						oBar.setDataset(
+							new sap.service.visualization.dataset.SimpleDMDataset({
+								dimensionItems: aChartDimensions,
+								dimensionName: "countries",
+								measureNames: ["GDP"],
+								data: aChartMeasures
+							})
+						);
+
+					}				
+	            ); 
+				
+				var oVl = new sap.ui.commons.layout.VerticalLayout({
+					width: "100%",
+					content: [ 
+						new sap.ui.commons.layout.MatrixLayout({width: "100%",widths:["60%","40%"]})
+							.createRow(
+								myBubble,
+								oBar
+							),
+						oTable
+					]
+				});
+				mContent[key] = oVl;
+	        }
+	        return mContent[key];       
+	    }
+	    
+	    // when the user selects a workset, put the respective content into the shell's main area
+	    oShell.attachWorksetItemSelected(function(oEvent) {
+	        var key = oEvent.getParameter("key");  
+			oShell.setContent(getContent(key));
+	    });
+	    
+	    // set the initial content of the Shell - the Home pie is selected initially
+	    oShell.addContent(getContent("wi_home"));
+	
+	    // place the Shell into the <div> element defined below
+	    oShell.placeAt("shellArea");
+    });
+    
+    </script>
+
+</head>
+<body class="sapUiBody">
+
+    <!-- This is where the Shell will live -->
+    <div id="shellArea"></div>
+	
+</body>
+</html>

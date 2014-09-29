@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>Insert title here</title>
+<script id="sap-ui-bootstrap"
+          type="text/javascript"
+          src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
+          data-sap-ui-theme="sap_goldreflection"
+          data-sap-ui-libs="sap.ui.commons"></script>
+<script>
+	var myButton = new sap.ui.commons.Button("btn");
+	myButton.setText("Hello world!");
+	myButton.attachPress(function(){$("#btn").fadeOut();});
+	myButton.placeAt("uiArea");
+	
+	/*$(function(){
+        $("#uiArea").sapui("Button", "btn", {
+            text:"Hello World!",
+            press:function(){$("#btn").fadeOut();}
+        });
+     });
+	*/
+</script>
+</head>
+<body class="sapUiBody">
+<div id="uiArea"></div>
+</body>
+</html>

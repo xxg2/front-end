@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.ui.commons"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
+
+		<script>
+			sap.ui.core.Control.extend("ColorBoxContainer", {
+				metadata:{
+					properties:{
+						"boxColor":"string"
+					}, 
+					aggregations:{
+						content: {singularName:"content"}
+					}
+				}, 
+				renderer:function(oRm, oControl) {
+					oRm.write("<div");
+					oRm.writeControlData(oControl);
+					oRm.writeClasses();
+					oRm.write(">");
+					var aChildren = oControl.getContent();
+					for(var i=0;i<aChildren.length;i++) {
+						oRm.write("<div");
+						oRm.addStyle("display", "inline-block");
+						oRm.addStyle("border", "3px solid "+oControl.getBoxColor());
+						oRm.writeStyles();
+						oRm.write(">");
+						oRm.renderControl(aChildren[i]);
+						oRm.write("</div>");
+					}
+				}
+			});
+			
+			var btn = new sap.ui.commons.Button({text:"Hello World"});
+			var tf = new sap.ui.commons.TextField({value:"edit text here"});
+			var container = new ColorBoxContainer({
+				boxColor:"#ff7700", 
+				content:[btn, tf]
+			});
+			container.placeAt('content');
+		</script>
+
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>

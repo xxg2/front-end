@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.ui.commons"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
+
+		<script>
+		    //1. Defining the Data
+			// JSON sample data
+			var data = {
+			    firstName: "John",
+			    lastName: "Doe",
+			    birthday: {day:01,month:05,year:1982},
+			    address:[{city:"Heidelberg"}],
+			    enabled: false
+			};
+			//2. Creating a Data Binding Model Instance
+			// create JSON model instance
+			var oModel = new sap.ui.model.json.JSONModel();
+			// set the data for the model
+			oModel.setData(data);
+			// set the model to the core
+			sap.ui.getCore().setModel(oModel);
+			
+			//3. Creating Controls and Property Binding
+			// create your controls        
+			var oTextView = new sap.ui.commons.TextView("textView", {
+			    // bind text property of textview to firstName property in the model
+			    text: "{/firstName}",
+			    tooltip: "First Name"
+			}).placeAt("content");
+			var oTxt = new sap.ui.commons.TextField("txtField", {
+			    // bind text property of textfield to firstName property in the model
+			    value: "{/firstName}"
+			}).placeAt("content");
+			// create your controls
+			var oChkBx = new sap.ui.commons.CheckBox("box", {
+			    // bind checked property against enabled property in the model
+			    checked: "{/enabled}", 
+			    change: handleCheckBoxChange
+			}).placeAt("content");
+			// generic bind method bindProperty(control property, model property)
+			oTxt.bindProperty("enabled", "/enabled");
+			
+			function handleCheckBoxChange(oEvent){
+			    var bEnabled = oEvent.getParameter("checked");
+			    // modify the enabled property value in the model to reflect changes
+			    oModel.setData({enabled: bEnabled}, true); // true means merge the data instead of replacing
+			};
+			
+			// create your controls
+			var oBtn = new sap.ui.commons.Button({
+			    id: "btn", 
+			    text: "Trigger Change",
+			    press: update
+			}).placeAt("content");
+
+			function update(){
+			    // modify the firstName property value in the model to reflect changes
+			    oModel.setData({firstName: sap.ui.getCore().byId("txtField").getValue()}, true);
+			};
+			
+		</script>
+
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>

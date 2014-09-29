@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.m"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
+
+		<script>
+			sap.ui.core.Control.extend("my.Square", {
+				metadata:{
+					properties:{
+						"text":"string",
+						"size":{type:"sap.ui.core.CSSSize", defaultValue:"200px"}
+					}
+				}, 
+				
+				renderer: function(oRm, oControl) {
+					oRm.write("<div");
+					oRm.writeControlData(oControl);
+					oRm.addStyle("width", oControl.getSize());
+					oRm.writeStyles();
+					oRm.addClass("mySquare");
+					oRm.writeClasses();
+					oRm.write(">");
+					oRm.writeEscaped(oControl.getText());
+					oRm.write("</div>");
+				},
+				
+				onclick:function(evt) {
+					alert(this.getText());
+				}
+			});
+			
+			var myControl = new my.Square({text:"Hello", size:"50px"});
+			myControl.placeAt("content");
+		</script>
+		<style>
+		/* PART 3: the style common to all control instances */
+		/* Could also be added inline to the control HTML, or separated out into a CSS file */
+		
+		.mySquare {                  /* style the CSS class that has been written by the renderer method */
+			display: inline-block;   /* enable squares to appear next to each other within one line */
+			border: 1px solid red;   /* add some border, so the square can actually be seen */
+			background-color: #ddd;
+			padding: 8px;
+			text-align: center;
+			-moz-box-sizing: border-box; /* consider padding+border part of the width/height */
+			box-sizing: border-box;
+		}
+	</style>
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>

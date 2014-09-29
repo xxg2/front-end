@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta http-equiv='Content-Type' content='text/html;charset=UTF-8'/>
+
+		<script src="resources/sap-ui-core.js"
+				id="sap-ui-bootstrap"
+				data-sap-ui-libs="sap.m"
+				data-sap-ui-theme="sap_bluecrystal">
+		</script>
+		<!-- only load the mobile lib "sap.m" and the "sap_bluecrystal" theme -->
+
+		<script>
+			var data = {
+				names: [
+					{firstName: "Peter", lastName: "Mueller"},
+					{firstName: "Petra", lastName: "Maier"},
+					{firstName: "Thomas", lastName: "Smith"},
+					{firstName: "John", lastName: "Williams"},
+					{firstName: "Maria", lastName: "Jones"}
+				]
+			};
+			
+			var model = new sap.ui.model.json.JSONModel();
+			model.setData(data);
+			var list = new sap.m.List({
+				headerText:"Names"
+			});
+			
+			list.bindItems({
+				path:"/names",
+				sorter:new sap.ui.model.Sorter("lastName"),
+				template: new sap.m.StandardListItem({
+					title:"{lastName}", 
+					description:"{firstName}"
+				})
+			});
+			list.setModel(model);
+			var app = new sap.m.App();
+			var page = new sap.m.Page({
+				title:"List Page",
+				content: list
+			});
+			app.addPage(page).placeAt("content");
+		</script>
+
+	</head>
+	<body class="sapUiBody" role="application">
+		<div id="content"></div>
+	</body>
+</html>
