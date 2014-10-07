@@ -1,0 +1,12 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
+		controllerName="sap.ui.splitapp.view.Master" displayBlock="true">
+	<Page title="Master" id="page">
+		<content>
+			<List id="list" items="{/Products}" growing="true" growingScrollToLoad="true">
+				<items>
+					<ObjectListItem title="{Name}" number="{Price}" numberUnit="USD"></ObjectListItem>
+				</items>				
+			</List>
+		</content>
+	</Page>
+</mvc:View>

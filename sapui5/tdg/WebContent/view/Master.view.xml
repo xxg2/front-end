@@ -24,7 +24,7 @@
 		<footer>
 			<Toolbar>
 				<ToolbarSpacer />
-				<Button icon="sap-icon://add" tooltip="{i18n>masterFooterAddButtonTooltip}"
+				<Button icon="sap-icon://filter" tooltip="{i18n>masterFooterAddButtonTooltip}"
 					press="onAddProduct" />
 			</Toolbar>
 		</footer>
