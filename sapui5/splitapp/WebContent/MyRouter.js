@@ -3,17 +3,22 @@ jQuery.sap.require("sap.ui.core.routing.Router");
 jQuery.sap.declare("sap.ui.splitapp.MyRouter");
 
 sap.ui.core.routing.Router.extend("sap.ui.splitapp.MyRouter", {
-	constructor:function() {
+	constructor : function() {
 		sap.ui.core.routing.Router.apply(this, arguments);
-		this._oRouteMatchedHandler = new sap.m.routing.RouteMatchedHandler(this);
-	}, 
+	},
 	
-	myNavBack:function(sRoute, mData) {
-		
-	}, 
-	
-	destory:function() {
-		sap.ui.core.routing.Router.prototype.destory.apply(this);
-		this._oRouteMatchedHandler.destroy();
-	}, 
+	destroy : function() {
+		sap.ui.core.routing.Router.prototype.destroy.apply(this, arguments);
+	},
+
+	_findSplitApp : function(oControl) {
+		sAncestorControlName = "idAppControl";
+
+		if (oControl instanceof sap.ui.core.mvc.View && oControl.byId(sAncestorControlName)) {
+			return oControl.byId(sAncestorControlName);
+		}
+
+		return oControl.getParent() ? this._findSplitApp(oControl.getParent(), sAncestorControlName) : null;
+	}
+
 });

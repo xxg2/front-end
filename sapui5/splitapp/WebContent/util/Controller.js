@@ -7,6 +7,6 @@ sap.ui.core.mvc.Controller.extend("sap.ui.splitapp.util.Controller", {
 	}, 
 	
 	getRouter : function () {
-		return sap.ui.core.UIComponent.getRouterFor(this);	
+		return sap.ui.core.UIComponent.getRouterFor(this);
 	}
 });

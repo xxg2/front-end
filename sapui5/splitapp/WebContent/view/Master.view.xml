@@ -1,11 +1,19 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
 		controllerName="sap.ui.splitapp.view.Master" displayBlock="true">
-	<Page title="Master" id="page">
+	<Page title="Orders" id="page">
 		<content>
-			<List id="list" items="{/Products}" growing="true" growingScrollToLoad="true">
+			<List id="list" mode="SingleSelectMaster" select="onSelect"
+			items="{/SalesOrders}" noDataText="No Data" growing="true" growingThreshold="10">
 				<items>
-					<ObjectListItem title="{Name}" number="{Price}" numberUnit="USD"></ObjectListItem>
-				</items>				
+					<ObjectListItem title="{path:'SdDoc', formatter:'sap.ui.splitapp.util.Formatter.sdDocValue'}" 
+					number="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}" type="Active" numberUnit="{CurrIso}">
+						<firstStatus>
+				          <ObjectStatus
+				            text="{DocStatus}"
+				            state="Error" />
+				        </firstStatus>
+					</ObjectListItem>
+				</items>
 			</List>
 		</content>
 	</Page>

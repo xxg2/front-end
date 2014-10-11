@@ -5,41 +5,45 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 	metadata : {
 		name : "Split App",
 		version : "1.0",
-		includes : [],
-		dependencies : {
-			libs : ["sap.m", "sap.ui.layout"],
-			components : []
-		},
 
 		rootView : "sap.ui.splitapp.view.App",
 
 		config : {
 			serviceConfig : {
 				name : "Northwind",
-				serviceUrl : "/splitapp/proxy/http/services.odata.org/V2/(S(sapuidemotdg))/OData/OData.svc/"
+				serviceUrl : "proxy/https/ldai1ket.wdf.sap.corp:44313/sap/opu/odata/sap/ZPOC_TEST_SRV/"
 			}
 		},
-
 		routing : {
 			config : {
 				routerClass : sap.ui.splitapp.MyRouter,
 				viewType : "XML",
 				viewPath : "sap.ui.splitapp.view",
-				targetAggregation : "detailPages",
-				clearTarget : false
+				targetAggregation : "detailPages"
 			},
 			routes : [
 				{
 					pattern : "",
-					name : "main",
+					name : "master",
 					view : "Master",
+					viewLevel : 0,
 					targetAggregation : "masterPages",
 					targetControl : "idAppControl",
 					subroutes : [
 						{
-							pattern : "{product}/:tab:",
-							name : "product",
-							view : "Detail"
+							pattern : "{SalesOrder}",
+							name : "detail",
+							view : "Detail", 
+							viewLevel : 1
+							/*subroutes : [
+								{
+									pattern : "",
+									name : "lineItem",
+									view : "LineItem",
+									viewLevel : 2,
+									targetAggregation : "detailPages"
+								}
+							]*/
 						}
 					]
 				}
@@ -48,30 +52,12 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 	},
 
 	init : function() {
-		sap.ui.core.UIComponent.prototype.init.apply(this, arguments);
-
+		sap.ui.core.UIComponent.prototype.init.apply(this);
 		var mConfig = this.getMetadata().getConfig();
-
 		var sServiceUrl = mConfig.serviceConfig.serviceUrl;
-
-		// Create and set domain model to the component
-		var oModel = new sap.ui.model.odata.ODataModel(sServiceUrl, true);
+		var oModel = new sap.ui.model.odata.ODataModel(sServiceUrl, true, "liangly", "430002");
 		this.setModel(oModel);
-
-		// set device model
-		var deviceModel = new sap.ui.model.json.JSONModel({
-			isTouch : sap.ui.Device.support.touch,
-			isNoTouch : !sap.ui.Device.support.touch,
-			isPhone : sap.ui.Device.system.phone,
-			isNoPhone : !sap.ui.Device.system.phone,
-			listMode : sap.ui.Device.system.phone ? "None" : "SingleSelectMaster",
-			listItemType : sap.ui.Device.system.phone ? "Active" : "Inactive"
-		});
-		deviceModel.setDefaultBindingMode("OneWay");
-		this.setModel(deviceModel, "device");
-
 		this.getRouter().initialize();
-
 	}
 
 });
