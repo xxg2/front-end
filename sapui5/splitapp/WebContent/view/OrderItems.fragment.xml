@@ -15,7 +15,7 @@
 			<Column hAlign="Center"><header><Label text="Status" /></header></Column>
 			<Column hAlign="Center"><header><Label text="% Shipped" /></header></Column>
 		</columns>
-		<ColumnListItem type="Navigation" press="handleLineItemPress">
+		<ColumnListItem type="Navigation" press="fireLineItemPress">
 			<cells>
 				<ObjectIdentifier text="{ItmNumber}" />
 				<Text text="{TargetQty}" />

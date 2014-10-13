@@ -11,7 +11,7 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 		config : {
 			serviceConfig : {
 				name : "Northwind",
-				serviceUrl : "proxy/https/ldai1ket.wdf.sap.corp:44313/sap/opu/odata/sap/ZPOC_TEST_SRV/"
+				serviceUrl : "proxy/https/ldai1ket.wdf.sap.corp:44313/sap/opu/odata/sap/ZGW100_DANNY3_BUPA_SRV/"
 			}
 		},
 		routing : {
@@ -34,16 +34,26 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 							pattern : "{SalesOrder}",
 							name : "detail",
 							view : "Detail", 
-							viewLevel : 1
-							/*subroutes : [
+							viewLevel : 1, 
+							targetAggregation : "detailPages",
+							subroutes : [
 								{
-									pattern : "",
-									name : "lineItem",
-									view : "LineItem",
+									pattern : "{SalesOrderItem}",
+									name : "schedulesItems",
+									view : "SchedulesItems",
 									viewLevel : 2,
 									targetAggregation : "detailPages"
+//									subroutes : [
+//													{
+//														pattern : "{DeliverySchedule}/",
+//														name : "deliverySchedules",
+//														view : "DeliverySchedules",
+//														viewLevel : 3,
+//														targetAggregation : "detailPages"
+//													}
+//												]
 								}
-							]*/
+							]
 						}
 					]
 				}
@@ -57,6 +67,9 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 		var sServiceUrl = mConfig.serviceConfig.serviceUrl;
 		var oModel = new sap.ui.model.odata.ODataModel(sServiceUrl, true, "liangly", "430002");
 		this.setModel(oModel);
+		oModel.attachRequestCompleted(function () {
+			sap.ui.getCore().getEventBus().publish("app", "InitialLoadFinished");
+		});
 		this.getRouter().initialize();
 	}
 

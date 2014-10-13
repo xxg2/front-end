@@ -23,7 +23,7 @@
 				<items>
 					<IconTabFilter key="deliverySchedule" icon="sap-icon://hint">
 						<content>
-							<core:Fragment fragmentName="sap.ui.splitapp.view.DeliverySchedules" type="XML" />
+							<core:Fragment fragmentName="sap.ui.splitapp.view.DeliveryItems" type="XML" />
 						</content>
 					</IconTabFilter>
 					<IconTabFilter key="deliverySchedule" icon="sap-icon://group" />

@@ -108,7 +108,6 @@ sap.ui.demo.tdg.util.Controller.extend("sap.ui.demo.tdg.view.Master", {
 		// Get the list item, either from the listItem parameter or from the event's
 		// source itself (will depend on the device-dependent mode).
 		this.showDetail(oEvent.getParameter("listItem") || oEvent.getSource());
-		alert(new sap.ui.core.IconPool().getIconCollectionNames());
 	},
 
 	showDetail : function(oItem) {

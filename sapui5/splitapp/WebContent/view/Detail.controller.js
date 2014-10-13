@@ -9,8 +9,8 @@ sap.ui.splitapp.util.Controller.extend("sap.ui.splitapp.view.Detail", {
 * @memberOf view.Detail
 */
 	onInit : function() {
-		this.getView().setBusy(true);
-		this.getEventBus().subscribe("Master", "InitialLoadFinished", this.onMasterLoaded, this);
+		//this.getView().setBusy(true);
+		//this.getEventBus().subscribe("Master", "InitialLoadFinished", this.onMasterLoaded, this);
 		
 		this.getRouter().attachRouteMatched(this.onRouteMatched, this);
 	}, 
@@ -21,9 +21,13 @@ sap.ui.splitapp.util.Controller.extend("sap.ui.splitapp.view.Detail", {
 	},
 	
 	onRouteMatched: function(oEvent) {
+		if (oEvent.getParameter("name") !== "detail") {
+			return;
+		}
 		var oParameters = oEvent.getParameters();
-		var sPath = "/" + oParameters.arguments.SalesOrder;
+		var sPath = "/" + (oParameters.arguments.SalesOrder || oParameters.arguments.SalesOrderItem || oParameters.arguments.DeliverySchedule);
 		this.bindView(sPath);
+		this.getView().setBusy(false);
 	}, 
 	
 	fireDetailChanged : function (sProductPath) {
@@ -35,5 +39,12 @@ sap.ui.splitapp.util.Controller.extend("sap.ui.splitapp.view.Detail", {
 		oView.bindElement(sProductPath);
 		
 		this.fireDetailChanged(sProductPath);
+	}, 
+	
+	fireLineItemPress : function (evt) {
+		var sPath = evt.oSource.getBindingContext().getPath();
+		this.getRouter().navTo("schedulesItems", {
+			SalesOrderItem: sPath.substr(1)
+		}, false);
 	}
 });
