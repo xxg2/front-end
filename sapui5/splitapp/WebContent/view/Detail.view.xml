@@ -1,10 +1,10 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core"
 	controllerName="sap.ui.splitapp.view.Detail">
-	<Page title="{Name} Order">
+	<Page title="{Name} Order" id="detail">
 		<content>
 			<ObjectHeader
 				title="{path:'SdDoc', formatter:'sap.ui.splitapp.util.Formatter.sdDocValue'}"
-				number="{NetValue}"
+				number="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}"
 				numberUnit="{CurrIso}">
 				<attributes>
 					<ObjectAttribute title="Ordered"
@@ -13,23 +13,13 @@
 						text="{path:'ReqDate', type:'sap.ui.model.type.Date'}" />
 				</attributes>
 				<firstStatus>
-					<ObjectStatus text="{DocStatus}" state="Error" />
+					<ObjectStatus text="{path:'StatusDoc', formatter:'sap.ui.splitapp.util.Formatter.statusDocValue'}" />
 				</firstStatus>
 				<secondStatus>
-					<ObjectStatus title="Total Amount" text="{parts:[{path:'NetValue'},{path:'ExchgRate'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}"/>
+					<ObjectStatus title="Total Amount" text="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}"/>
 				</secondStatus>
 			</ObjectHeader>
-			<IconTabBar id="idIconTabBar">
-				<items>
-					<IconTabFilter key="deliverySchedule" icon="sap-icon://hint">
-						<content>
 							<core:Fragment fragmentName="sap.ui.splitapp.view.DeliveryItems" type="XML" />
-						</content>
-					</IconTabFilter>
-					<IconTabFilter key="deliverySchedule" icon="sap-icon://group" />
-				</items>
-			</IconTabBar>
-			<core:Fragment fragmentName="sap.ui.splitapp.view.OrderItems" type="XML" />
 		</content>
 	</Page>
 </mvc:View>

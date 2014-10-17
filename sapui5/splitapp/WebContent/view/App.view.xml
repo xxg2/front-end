@@ -1,4 +1,3 @@
-<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
-	displayBlock="true">
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" displayBlock="true">
 	<SplitApp id="idAppControl" />
 </mvc:View>

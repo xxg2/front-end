@@ -1,23 +1,117 @@
 <core:FragmentDefinition xmlns:l="sap.ui.layout"
 	xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:f="sap.ui.layout.form">
-<f:SimpleForm title="Delivery Schedules">
-	<IconTabBar id="idIconTabBarSeparatorMixed"
-		expanded="false" expandable="false">
+	<IconTabBar  id="idIconTabBar" select="onDetailSelect">
 		<items>
-			<IconTabFilter count="15" text="Schedule(s)" showAll="true" key="All"/>
-			<IconTabSeparator icon="" />
-			<IconTabFilter icon="sap-icon://task" iconColor="Critical" text="Open" design="Horizontal"
-				count="3">
-				<Text text="Attachments go here ..." />
+			<IconTabFilter count="{path:'TotalSchedulesCount', formatter:'sap.ui.splitapp.util.Formatter.countValue'}" text="Schedule(s)" showAll="true" key="?" >
+				<Table id="lineItemList" items="{SalesOrderItems}">
+					<headerToolbar>
+						<Toolbar>
+							<Label text="All" />
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column><header><Label text="Item" /></header></Column>
+						<Column width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="Center"><header><Label text="Quantity" /></header></Column>
+						<Column width="10em" minScreenWidth="Tablet" demandPopin="true"	hAlign="Center"><header><Label text="Your Price" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Total" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Status" /></header></Column>
+						<Column hAlign="Center"><header><Label text="% Shipped" /></header></Column>
+					</columns>
+					<ColumnListItem type="Navigation" press="fireLineItemPress">
+						<cells>
+							<ObjectIdentifier text="{ShortText}" />
+							<Text text="{path:'ReqQty', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'} {CurrenIso}" />
+							<Text text="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<ProgressIndicator width="90%" percentValue="10" showValue="true" displayValue="10%" height="1.375em"/>
+						</cells>
+					</ColumnListItem>
+				</Table>
 			</IconTabFilter>
-			<IconTabFilter icon="sap-icon://process" iconColor="Negative" text="In Progress" design="Horizontal"
-				count="12">
-				<Text text="Notes go here ..." />
+			<IconTabFilter icon="sap-icon://task" iconColor="Critical" text="Open" design="Horizontal" key="?$filter=StatusDoc eq 'A'"
+				count="{path:'OpenSchedulesCount', formatter:'sap.ui.splitapp.util.Formatter.countValue'}">
+				<Table id="lineItemList2" items="{SalesOrderItems}">
+					<headerToolbar>
+						<Toolbar>
+							<Label text="Open" />
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column><header><Label text="Item" /></header></Column>
+						<Column width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="Center"><header><Label text="Quantity" /></header></Column>
+						<Column width="10em" minScreenWidth="Tablet" demandPopin="true"	hAlign="Center"><header><Label text="Your Price" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Total" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Status" /></header></Column>
+						<Column hAlign="Center"><header><Label text="% Shipped" /></header></Column>
+					</columns>
+					<ColumnListItem type="Navigation" press="fireLineItemPress">
+						<cells>
+							<ObjectIdentifier text="{ShortText}" />
+							<Text text="{path:'ReqQty', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'} {CurrenIso}" />
+							<Text text="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<ProgressIndicator width="90%" percentValue="30" showValue="true" displayValue="30%" height="1.375em"/>
+						</cells>
+					</ColumnListItem>
+				</Table>
 			</IconTabFilter>
-			<IconTabFilter icon="sap-icon://shipping-status" iconColor="Positive" text="Shipped" design="Horizontal">
-				<Text text="People content goes here ..." />
+			<IconTabFilter icon="sap-icon://process" iconColor="Negative" text="In Progress" design="Horizontal" key="?$filter=StatusDoc eq 'B'"
+				count="{path:'inProcessSchedulesCount', formatter:'sap.ui.splitapp.util.Formatter.countValue'}">
+				<Table id="lineItemList3" items="{SalesOrderItems}">
+					<headerToolbar>
+						<Toolbar>
+							<Label text="In Progress" />
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column><header><Label text="Item" /></header></Column>
+						<Column width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="Center"><header><Label text="Quantity" /></header></Column>
+						<Column width="10em" minScreenWidth="Tablet" demandPopin="true"	hAlign="Center"><header><Label text="Your Price" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Total" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Status" /></header></Column>
+						<Column hAlign="Center"><header><Label text="% Shipped" /></header></Column>
+					</columns>
+					<ColumnListItem type="Navigation" press="fireLineItemPress">
+						<cells>
+							<ObjectIdentifier text="{ShortText}" />
+							<Text text="{path:'ReqQty', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'} {CurrenIso}" />
+							<Text text="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<ProgressIndicator width="90%" percentValue="30" showValue="true" displayValue="30%" height="1.375em"/>
+						</cells>
+					</ColumnListItem>
+				</Table>
+			</IconTabFilter>
+			<IconTabFilter icon="sap-icon://shipping-status" iconColor="Positive" key="?$filter=StatusDoc eq 'C'" text="Completed" design="Horizontal" count="{path:'shippedSchedulesCount', formatter:'sap.ui.splitapp.util.Formatter.countValue'}">
+				<Table id="lineItemList4" items="{SalesOrderItems}">
+					<headerToolbar>
+						<Toolbar>
+							<Label text="Completed" />
+						</Toolbar>
+					</headerToolbar>
+					<columns>
+						<Column><header><Label text="Item" /></header></Column>
+						<Column width="6em" minScreenWidth="Tablet" demandPopin="true" hAlign="Center"><header><Label text="Quantity" /></header></Column>
+						<Column width="10em" minScreenWidth="Tablet" demandPopin="true"	hAlign="Center"><header><Label text="Your Price" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Total" /></header></Column>
+						<Column width="6em" hAlign="Center"><header><Label text="Status" /></header></Column>
+						<Column hAlign="Center"><header><Label text="% Shipped" /></header></Column>
+					</columns>
+					<ColumnListItem type="Navigation" press="fireLineItemPress">
+						<cells>
+							<ObjectIdentifier text="{ShortText}" />
+							<Text text="{path:'ReqQty', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'} {CurrenIso}" />
+							<Text text="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}" />
+							<Text text="{path:'NetValue', formatter:'sap.ui.splitapp.util.Formatter.currenyValueQty'}" />
+							<ProgressIndicator width="90%" percentValue="30" showValue="true" displayValue="30%" height="1.375em"/>
+						</cells>
+					</ColumnListItem>
+				</Table>
 			</IconTabFilter>
 		</items>
 	</IconTabBar>
-</f:SimpleForm>
 </core:FragmentDefinition>

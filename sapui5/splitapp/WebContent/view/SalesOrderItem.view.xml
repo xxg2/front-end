@@ -1,0 +1,12 @@
+<mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" xmlns:core="sap.ui.core"
+	controllerName="sap.ui.splitapp.view.SalesOrderItem">
+	<Page id="salesOrderItem" title="Delivery Schedules" showNavButton="true">
+		<content>
+			<ObjectHeader title="adf" number="adf" numberUnit="RMB">
+				<attributes>
+				<ObjectAttribute text="ProductName"/>
+			</attributes>
+			</ObjectHeader>
+		</content>
+	</Page>
+</mvc:View>

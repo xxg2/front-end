@@ -2,49 +2,59 @@ jQuery.sap.require("sap.ui.splitapp.util.Controller");
 jQuery.sap.require("sap.ui.splitapp.util.Formatter");
 
 sap.ui.splitapp.util.Controller.extend("sap.ui.splitapp.view.Detail", {
-
-/**
-* Called when a controller is instantiated and its View controls (if available) are already created.
-* Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
-* @memberOf view.Detail
-*/
 	onInit : function() {
-		//this.getView().setBusy(true);
-		//this.getEventBus().subscribe("Master", "InitialLoadFinished", this.onMasterLoaded, this);
-		
+		this.getView().setBusy(true);
 		this.getRouter().attachRouteMatched(this.onRouteMatched, this);
 	}, 
-	
-	onMasterLoaded :  function (sChannel, sEvent, oData) {
-		this.bindView(oData.oListItem.getBindingContext().getPath());
-		this.getView().setBusy(false);
-	},
 	
 	onRouteMatched: function(oEvent) {
 		if (oEvent.getParameter("name") !== "detail") {
 			return;
 		}
 		var oParameters = oEvent.getParameters();
-		var sPath = "/" + (oParameters.arguments.SalesOrder || oParameters.arguments.SalesOrderItem || oParameters.arguments.DeliverySchedule);
+		var sPath = "/" + oParameters.arguments.order;
+		
+		var oIconTabBar = this.getView().byId("idIconTabBar");
+		oIconTabBar.getItems().forEach(function(oItem) {
+			
+			if(oItem) {
+				//oItem.bindElement(sPath+"/"+oItem.getKey());
+			}
+		});
+		
 		this.bindView(sPath);
 		this.getView().setBusy(false);
 	}, 
 	
-	fireDetailChanged : function (sProductPath) {
-		this.getEventBus().publish("Detail", "Changed", { sProductPath : sProductPath });
-	},
-	
 	bindView : function (sProductPath) {
 		var oView = this.getView();
 		oView.bindElement(sProductPath);
-		
-		this.fireDetailChanged(sProductPath);
 	}, 
 	
-	fireLineItemPress : function (evt) {
-		var sPath = evt.oSource.getBindingContext().getPath();
-		this.getRouter().navTo("schedulesItems", {
-			SalesOrderItem: sPath.substr(1)
-		}, false);
+	handleTabSelect : function (evt) {
+		var key = evt.getParameter("key");
+		var item = evt.getParameter("item");
+		if (item.getContent().length === 0) {
+			var view = new sap.ui.view({
+				id : "tabView" + key,
+				viewName : "sap.ui.demo.poa.view.Detail" + key,
+				type : "XML"
+			});
+			item.addContent(view);
+		}
+	},
+	
+	fireLineItemPress : function (oEvent) {
+		var sPath = oEvent.oSource.getBindingContext().getPath();
+		this.getRouter().navTo("salesOrderItem", {
+			deliveryItems: sPath.substr(1)
+		}, true);
+	}, 
+	
+	onDetailSelect : function(oEvent) {
+		this.getRouter().navTo("detail",{
+			order: oEvent.getSource().getBindingContext().getPath().substr(1), 
+			tab: oEvent.getParameter("selectedKey")
+		}, true);
 	}
 });

@@ -11,7 +11,7 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 		config : {
 			serviceConfig : {
 				name : "Northwind",
-				serviceUrl : "proxy/https/ldai1ket.wdf.sap.corp:44313/sap/opu/odata/sap/ZGW100_DANNY3_BUPA_SRV/"
+				serviceUrl : "proxy/https/ldai1ket.wdf.sap.corp:44313/sap/opu/odata/sap/ZPOC_TEST_SRV/"
 			}
 		},
 		routing : {
@@ -31,29 +31,16 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 					targetControl : "idAppControl",
 					subroutes : [
 						{
-							pattern : "{SalesOrder}",
+							pattern : "detail/:order:",
 							name : "detail",
-							view : "Detail", 
-							viewLevel : 1, 
-							targetAggregation : "detailPages",
-							subroutes : [
-								{
-									pattern : "{SalesOrderItem}",
-									name : "schedulesItems",
-									view : "SchedulesItems",
-									viewLevel : 2,
-									targetAggregation : "detailPages"
-//									subroutes : [
-//													{
-//														pattern : "{DeliverySchedule}/",
-//														name : "deliverySchedules",
-//														view : "DeliverySchedules",
-//														viewLevel : 3,
-//														targetAggregation : "detailPages"
-//													}
-//												]
-								}
-							]
+							view : "Detail",
+							viewLevel : 1
+						}, 
+						{
+							pattern : "orderItem/:deliveryItems:",
+							name : "salesOrderItem",
+							view : "SalesOrderItem",
+							viewLevel : 1,
 						}
 					]
 				}
@@ -66,10 +53,8 @@ sap.ui.core.UIComponent.extend("sap.ui.splitapp.Component", {
 		var mConfig = this.getMetadata().getConfig();
 		var sServiceUrl = mConfig.serviceConfig.serviceUrl;
 		var oModel = new sap.ui.model.odata.ODataModel(sServiceUrl, true, "liangly", "430002");
+		oModel.setDefaultBindingMode("TwoWay");
 		this.setModel(oModel);
-		oModel.attachRequestCompleted(function () {
-			sap.ui.getCore().getEventBus().publish("app", "InitialLoadFinished");
-		});
 		this.getRouter().initialize();
 	}
 

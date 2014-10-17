@@ -1,6 +1,6 @@
 <mvc:View xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m"
-		controllerName="sap.ui.splitapp.view.Master" displayBlock="true">
-	<Page title="Orders" id="page">
+		controllerName="sap.ui.splitapp.view.Master">
+	<Page title="Orders">
 		<content>
 			<List id="list" mode="SingleSelectMaster" select="onSelect"
 			items="{/SalesOrders}" noDataText="No Data" growing="true" growingThreshold="10">
@@ -9,8 +9,7 @@
 					number="{parts:[{path:'NetValue'},{path:'ReqQty'}], formatter:'sap.ui.splitapp.util.Formatter.netValueQty'}" type="Active" numberUnit="{CurrIso}">
 						<firstStatus>
 				          <ObjectStatus
-				            text="{DocStatus}"
-				            state="Error" />
+				            text="{path:'StatusDoc', formatter:'sap.ui.splitapp.util.Formatter.statusDocValue'}" />
 				        </firstStatus>
 					</ObjectListItem>
 				</items>
