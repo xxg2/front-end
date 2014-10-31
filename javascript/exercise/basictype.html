@@ -1,0 +1,73 @@
+<html>
+	<header>
+		<script type="text/javascript">
+			var result = "Brick"<"alphabet"; //true
+			var result = "Brick".toLowerCase() <"alphabet".toLowerCase(); //false
+			var result = "23"<"3"; //true
+			var result = "23" < 3; //false. "23"会转成23
+			var result = "a"<3; //false. "a"=NaN
+			var result = NaN<3; //false
+			var result = NaN>=3;//false
+
+			var result1 = ("55" == 55); //true
+			var result1 = ("55" === 55);//false。这是全等操作符，只在两个操作数未经转换就相等的情况下返回true。
+			/*var result1 = 5-true; //4. true=1
+			var result2 = NaN-1;  //NaN
+			var result3 = 5-3;    //2
+			var result4 = 5-"";   //5. ""=0
+			var result5 = 5-"2";  //3. "2"=2
+			var result6 = 5-null; //5. null=0*/
+
+
+			/*alert(!false); //true
+			alert(!"blue"); //false
+			alert(!0); //true
+			alert(!NaN); //true
+			alert(!""); //true
+			alert(!12345); //false*/
+
+			/*var s1 = "2";
+			var s2 = "z";
+			var b = false;
+			var f = 1.1;
+			var o = {valueOf:function() {
+				return -1;
+			}};
+			s1++; //3
+			s2++; //NaN
+			b++;  //1
+			f--;  //0.100000000000009
+			o--;  //-2*/
+
+
+
+			/*var octalNum1 = 070; //8进制
+			var hexNum1 = 0xA;//16进制
+			var floatNum1 = 1.1;
+			//浮点数运算有误差。0.1+0.2不是0.3，而是0.3000000000000004
+			var a = 0.1;
+			var b = 0.2;
+			if(a+b==0.3) {
+				alert("you got 0.3");
+			}*/
+
+			/*var car = null;
+			alert(typeof car); //"object"
+			alert(null == undefined);  //true
+
+			//boolean type
+			var found = true;
+			var lost = false;
+			var message = "Hello World!";
+			// 非空字符串返回true，""返回false
+			var messageAsBoolean = Boolean(message); 
+			//Number 非0返回true，0和NaN返回false
+			//Object 对象返回true，null返回false
+			//Undefined undefined返回false	
+
+			if(message) {
+				alert("Value is true");
+			}*/
+		</script>
+	</header>
+</html>
